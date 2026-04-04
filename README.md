@@ -11,6 +11,38 @@ It is designed for one common use case:
 - deny public inbound traffic by default
 - allow or deny explicit inbound exceptions with a short CLI
 
+In practice, you can think of it as:
+
+- a macOS firewall CLI
+- a `ufw`-like firewall tool for macOS
+- a simple way to manage public inbound exposure on a Mac that behaves more like a server than a personal laptop
+
+## Why this exists
+
+`macfw` exists to solve a gap that becomes obvious in IPv6-heavy home lab and self-hosting environments.
+
+Many people now run a Mac, especially a Mac mini, as a small always-on server for tools, automation, coding agents, model runtimes, remote access, or NAS-like tasks. In that role, the machine is no longer just a daily personal computer. It starts behaving more like a Linux VPS, a home server, or a small self-hosted node that needs controlled inbound access.
+
+On IPv4 networks, NAT often provides an extra layer between the machine and the public internet. On IPv6 networks, that assumption is much weaker. A Mac can end up directly reachable from the public internet, which means every listening service deserves deliberate review.
+
+macOS does include firewall features, but the built-in experience is mostly app-oriented and GUI-oriented. It is not a close equivalent to the Linux `ufw` workflow many server users expect when they want to answer simple questions such as:
+
+- which inbound ports are currently meant to be reachable from the public internet
+- how do I allow only one port
+- how do I allow only IPv4 or only IPv6
+- how do I remove or deny a rule from the command line
+
+`macfw` is built for that gap. It gives a Mac server or Mac mini a small command-line firewall workflow that feels much closer to `ufw`, while still using macOS `pf` underneath.
+
+## Who this is for
+
+`macfw` is especially meant for people who:
+
+- run a Mac mini or another macOS machine as an always-on server
+- use IPv6 and want tighter control over public inbound exposure
+- prefer terminal-based rule management over GUI-only firewall tools
+- want a simpler mental model similar to `ufw` rather than raw `pf.conf` editing
+
 ## Status
 
 `macfw` is currently an early `0.1.x` release. The rule model is usable, but the project should still be treated as a careful admin tool rather than a polished end-user app.
