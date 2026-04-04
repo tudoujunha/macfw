@@ -21,7 +21,7 @@ In practice, you can think of it as:
 
 `macfw` exists to solve a gap that becomes obvious in IPv6-heavy home lab and self-hosting environments.
 
-Many people now run a Mac, especially a Mac mini, as a small always-on server for tools, automation, coding agents, model runtimes, remote access, or NAS-like tasks. In that role, the machine is no longer just a daily personal computer. It starts behaving more like a Linux VPS, a home server, or a small self-hosted node that needs controlled inbound access.
+Many people now run a Mac, especially a Mac mini, as a small always-on server for tools, automation, coding agents, model runtimes, remote access, or NAS-like tasks. A particularly important example is people running OpenClaw on a Mac mini as a long-lived agent host. In that role, the machine is no longer just a daily personal computer. It starts behaving more like a Linux VPS, a home server, or a small self-hosted node that needs controlled inbound access.
 
 On IPv4 networks, NAT often provides an extra layer between the machine and the public internet. On IPv6 networks, that assumption is much weaker. A Mac can end up directly reachable from the public internet, which means every listening service deserves deliberate review.
 
@@ -38,6 +38,7 @@ macOS does include firewall features, but the built-in experience is mostly app-
 
 `macfw` is especially meant for people who:
 
+- run OpenClaw or similar always-on agent workloads on a Mac mini
 - run a Mac mini or another macOS machine as an always-on server
 - use IPv6 and want tighter control over public inbound exposure
 - prefer terminal-based rule management over GUI-only firewall tools
@@ -61,7 +62,7 @@ This project is for macOS only. It is not intended for Linux, BSD routers, or Wi
 ### Option 1: install from a local clone
 
 ```bash
-git clone https://github.com/<your-github-name>/macfw.git
+git clone https://github.com/tudoujunha/macfw.git
 cd macfw
 python3 -m pip install .
 ```
@@ -69,13 +70,13 @@ python3 -m pip install .
 ### Option 2: install directly from GitHub
 
 ```bash
-python3 -m pip install git+https://github.com/<your-github-name>/macfw.git
+python3 -m pip install git+https://github.com/tudoujunha/macfw.git
 ```
 
 ### Option 3: isolated CLI install with `pipx`
 
 ```bash
-pipx install git+https://github.com/<your-github-name>/macfw.git
+pipx install git+https://github.com/tudoujunha/macfw.git
 ```
 
 After installation:
