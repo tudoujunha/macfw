@@ -1,118 +1,316 @@
+English | [简体中文](./README.zh-CN.md)
+
 # macfw
 
-`macfw` is a small `pf` wrapper for macOS with a `ufw`-like workflow:
+`macfw` is a small `pf`-based firewall manager for macOS with a `ufw`-like CLI.
 
-- `macfw install --interface en1`
-- `macfw allow 22/tcp`
-- `macfw deny 22/tcp ipv6`
-- `macfw enable`
-- `macfw status`
-- `macfw disable`
-- `macfw uninstall`
+It is designed for one common use case:
 
-It manages a dedicated `pf` anchor at `/etc/pf.anchors/macfw` and a user config at `~/.config/macfw/config.json`.
+- keep loopback, LAN, and trusted private ranges reachable
+- keep outbound traffic open
+- deny public inbound traffic by default
+- allow or deny explicit inbound exceptions with a short CLI
+
+## Status
+
+`macfw` is currently an early `0.1.x` release. The rule model is usable, but the project should still be treated as a careful admin tool rather than a polished end-user app.
+
+## Requirements
+
+- macOS
+- Python 3.9+
+- `pfctl`
+- `sudo` access for commands that touch `/etc` or load `pf`
+
+This project is for macOS only. It is not intended for Linux, BSD routers, or Windows.
+
+## Install
+
+### Option 1: install from a local clone
+
+```bash
+git clone https://github.com/<your-github-name>/macfw.git
+cd macfw
+python3 -m pip install .
+```
+
+### Option 2: install directly from GitHub
+
+```bash
+python3 -m pip install git+https://github.com/<your-github-name>/macfw.git
+```
+
+### Option 3: isolated CLI install with `pipx`
+
+```bash
+pipx install git+https://github.com/<your-github-name>/macfw.git
+```
+
+After installation:
+
+```bash
+macfw --version
+```
+
+## Before you start
+
+You need to know which network interface receives the inbound traffic you want to protect.
+
+Common examples:
+
+- Wi-Fi: often `en0` or `en1`
+- Ethernet or USB adapters: often another `enX`
+
+Useful commands:
+
+```bash
+ifconfig
+networksetup -listallhardwareports
+route -n get default
+```
+
+If you are not sure, check which interface currently has your LAN or public IP address, then use that interface for `macfw install --interface ...`.
+
+## Quick start
+
+Install the managed anchor and choose the network interface to protect:
+
+```bash
+sudo macfw install --interface en1
+```
+
+Check the current state before enabling anything:
+
+```bash
+macfw status
+sudo macfw status
+```
+
+If you need SSH from the public internet, allow it before enabling the firewall:
+
+```bash
+sudo macfw allow 22/tcp
+```
+
+Enable the firewall:
+
+```bash
+sudo macfw enable
+```
+
+Show current state again:
+
+```bash
+macfw status
+sudo macfw status
+```
+
+Disable or uninstall later:
+
+```bash
+sudo macfw disable
+sudo macfw uninstall
+```
+
+## First-time setup checklist
+
+Recommended order:
+
+1. Install the anchor with the correct interface
+2. Review the default policy with `macfw status`
+3. Add any public inbound exceptions you need, such as `22/tcp`
+4. Enable the firewall
+5. Open a new test connection from the network you care about
+6. Only then close the old session
+
+This matters because enabling `pf` can interrupt an already-established SSH connection.
 
 ## Default policy
 
-- loopback traffic is always allowed
-- LAN inbound traffic is always allowed
-- Tailscale-style `100.64.0.0/10` traffic is treated as trusted private network traffic
-- outbound traffic is always allowed
-- public inbound traffic is blocked unless you explicitly allow a port
-
-## Install the CLI
-
-The executable lives at `~/.local/bin/macfw` and loads the project from `~/tools/macfw`.
+- allow loopback traffic
+- allow inbound traffic from the active interface network
+- allow inbound traffic from private RFC1918 IPv4 ranges
+- allow inbound traffic from `100.64.0.0/10`
+- allow inbound traffic from `fe80::/10` and `fd00::/8`
+- allow outbound traffic
+- deny public inbound traffic unless a rule explicitly allows it
 
 ## Rule model
 
-`macfw` manages inbound rules with one simple idea:
+Each rule answers four questions:
 
 - `from <source>`: who may connect
 - `port <port|all>`: which local port is reachable
-- `proto <proto>`: which protocol is allowed
+- `proto <proto>`: which protocol applies
 - `family <both|ipv4|ipv6>`: which IP family applies
 
-There is no separate `public/lan/local-only` mode anymore. The default policy is:
+Supported protocols today:
 
-- always allow loopback
-- always allow LAN/private/Tailscale-style traffic
-- always allow outbound traffic
-- block public inbound traffic unless you add an explicit allow rule
+- `tcp`
+- `udp`
+- `icmp`
+- `icmp6`
+- `any`
 
 ## Common commands
 
 ```bash
-macfw install --interface en1
 macfw allow 22/tcp
+macfw allow 53/udp
 macfw allow 22/tcp ipv6
-macfw allow 22/tcp from 1.2.3.4
-macfw allow proto icmp ipv4
-macfw allow from 192.168.0.0/16
-macfw deny 22/tcp ipv6
-macfw deny 22/tcp from 2001:db8::1
-macfw allow from any to any port 22 proto tcp
-macfw status
-macfw enable
-macfw disable
-macfw delete 22/tcp
-macfw delete deny 22/tcp ipv6
-macfw delete from 192.168.0.0/16
-macfw uninstall
-```
-
-## Rule examples
-
-```bash
-# allow any IPv4+IPv6 source to reach local TCP/22
-macfw allow 22/tcp
-
-# allow only IPv6 source traffic to local TCP/22
-macfw allow 22/tcp ipv6
-
-# allow only a specific source to reach local TCP/22
+macfw allow 22/tcp from any ipv4
 macfw allow 22/tcp from 1.2.3.4
 macfw allow 22/tcp from 2001:db8::1
-
-# allow IPv4 ICMP (for example ping)
 macfw allow proto icmp ipv4
-
-# allow a specific subnet to reach any local port/protocol
 macfw allow from 192.168.0.0/16
 
-# explicitly deny IPv6 TCP/22
 macfw deny 22/tcp ipv6
+macfw deny 22/tcp from 2001:db8::1
 
-# explicit full form
-macfw allow from any to any port 22 proto tcp
+macfw delete 22/tcp
+macfw delete 22/tcp ipv6
+macfw delete deny 22/tcp ipv6
+macfw delete from 192.168.0.0/16
+```
+
+## Common scenarios
+
+Allow public SSH on IPv6 only:
+
+```bash
+sudo macfw allow 22/tcp ipv6
+```
+
+Allow public DNS on UDP:
+
+```bash
+sudo macfw allow 53/udp
+```
+
+Allow SSH only from one specific address:
+
+```bash
+sudo macfw allow 22/tcp from 203.0.113.10
+sudo macfw allow 22/tcp from 2001:db8::10
+```
+
+Explicitly block a public IPv6 SSH rule:
+
+```bash
+sudo macfw deny 22/tcp ipv6
+```
+
+Remove a single matching rule without caring whether it is `allow` or `deny`:
+
+```bash
+sudo macfw delete 22/tcp
 ```
 
 ## Delete matching behavior
 
-- `macfw delete ...` removes `allow` rules by default
-- `macfw delete deny ...` removes `deny` rules
-- if you omit `ipv4` or `ipv6`, delete uses a broader family match
-  - example: `macfw delete 22/tcp` will remove `22/tcp ipv4`, `22/tcp ipv6`, or `22/tcp`
-- if you specify `ipv4` or `ipv6`, delete uses exact family matching
-  - example: `macfw delete 22/tcp ipv6` does not remove a broader `22/tcp` rule
+`delete` uses two matching modes:
+
+- if you specify `allow` or `deny`, deletion is constrained to that action
+- if you do not specify an action, `macfw` looks for all matching rules
+
+That means:
+
+- if exactly one rule matches, `delete` removes it even if it is a `deny`
+- if multiple rules match, `delete` stops and asks you to disambiguate with `allow`, `deny`, `ipv4`, `ipv6`, or a more specific source
+
+Family matching works like this:
+
+- omit `ipv4` or `ipv6`: broader family match
+- specify `ipv4` or `ipv6`: exact family match
+
+Examples:
+
+```bash
+# removes 22/tcp, 22/tcp ipv4, or 22/tcp ipv6 if there is only one match
+sudo macfw delete 22/tcp
+
+# removes only an IPv6 rule
+sudo macfw delete 22/tcp ipv6
+
+# removes only a deny rule
+sudo macfw delete deny 22/tcp ipv6
+```
 
 ## Status output
 
-`macfw status` shows the effective allow list that `macfw` manages:
+`macfw status` shows:
 
-- built-in trusted ranges such as loopback, your active interface network, RFC1918 private IPv4 ranges, `100.64.0.0/10`, `fe80::/10`, and `fd00::/8`
-- your own explicit allow rules
-- the final default deny for public inbound traffic
+- whether `macfw` is enabled
+- whether live `pf` is enabled
+- which interface is managed
+- your user-defined rules first
+- built-in trusted defaults
+- the final default deny
 
-If `pf` shows as `unknown`, that means the command could not read live `pfctl` state with the current privileges. Run `sudo macfw status` to verify the actual live PF state.
+If `pf` shows as `unknown`, run:
 
-## Install and uninstall behavior
+```bash
+sudo macfw status
+```
 
-- `install` backs up the current `/etc/pf.conf`, injects a `macfw` anchor hook, creates `/etc/pf.anchors/macfw`, and writes `~/.config/macfw/config.json`
-- `uninstall` removes the `macfw` anchor, restores the original `/etc/pf.conf` backup, and removes the macfw config and state files
+## What `install`, `enable`, `reload`, and `disable` do
 
-## Notes
+- `install`: creates the `macfw` anchor, injects the anchor hook into `/etc/pf.conf`, and writes the local config files
+- `enable`: writes the active anchor rules, validates the `pf` config, and enables `pf` if needed
+- `reload`: rewrites and reloads the anchor using the current config
+- `disable`: keeps the config on disk but disables the active `macfw` policy
+- `uninstall`: removes the anchor, restores the original `/etc/pf.conf` backup when available, and removes the local config files
 
-- Use `sudo` for commands that touch `/etc` or load `pf`, for example `sudo ~/.local/bin/macfw install --interface en1`
-- `status` works without `sudo`, but live `pf` state may still require `sudo`
-- changing CLI code under `~/tools/macfw` takes effect immediately because `~/.local/bin/macfw` imports the project directly; only `enable` or `reload` pushes rules into live `pf`
+## Safety notes
+
+Be careful when enabling or reloading rules over SSH.
+
+- enabling `pf` can drop an already-established SSH session
+- a newly opened LAN SSH session should still match the LAN allow rules
+- a public SSH session will be dropped unless you explicitly allow it first
+
+If you rely on public SSH access, add the rule before enabling:
+
+```bash
+sudo macfw allow 22/tcp
+sudo macfw enable
+```
+
+If you rely on LAN SSH only, the default trusted LAN rules should permit a newly opened LAN session after the firewall is enabled. An already-established session can still drop when `pf` first becomes active.
+
+## How it works
+
+`macfw` manages:
+
+- a dedicated anchor at `/etc/pf.anchors/macfw`
+- a hook in `/etc/pf.conf`
+- a user config at `~/.config/macfw/config.json`
+- a small state file at `~/.config/macfw/state.json`
+
+`install` backs up the current `/etc/pf.conf` before modifying it. `uninstall` restores the backup when available.
+
+## Limitations
+
+- there is no Homebrew formula yet
+- there is no PyPI release yet
+- interface detection is not automatic yet
+- this tool is focused on inbound filtering on macOS `pf`
+- this tool assumes you are comfortable using `sudo` and reading firewall state before enabling changes
+
+## Development
+
+Run the test suite:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Run directly from the repository checkout:
+
+```bash
+PYTHONPATH=. python3 -m macfw --help
+```
+
+## License
+
+MIT

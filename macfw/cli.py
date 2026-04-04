@@ -9,6 +9,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Callable, Mapping, Optional, Sequence, TextIO
 
+from macfw import __version__
 from macfw.config import Rule, VALID_FAMILIES
 from macfw.manager import MacFwManager, Paths
 
@@ -151,6 +152,8 @@ def delete_usage() -> str:
 def command_help(argv: Sequence[str], parser: argparse.ArgumentParser) -> str | None:
     if not argv:
         return None
+    if len(argv) == 1 and argv[0] in {"-V", "--version"}:
+        return f"macfw {__version__}"
     if argv[0] in {"-h", "--help"}:
         return parser.format_help()
     if len(argv) == 2 and argv[1] in {"-h", "--help"}:
