@@ -13,7 +13,7 @@ class CliTests(unittest.TestCase):
         exit_code = main(["--version"], stdout=stdout)
 
         self.assertEqual(0, exit_code)
-        self.assertIn("macfw 0.1.0", stdout.getvalue())
+        self.assertIn("macfw 0.1.1", stdout.getvalue())
 
     def test_deny_help_shows_ufw_like_examples(self) -> None:
         stdout = io.StringIO()
