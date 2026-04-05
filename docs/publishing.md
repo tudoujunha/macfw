@@ -67,9 +67,9 @@ After TestPyPI succeeds:
 3. Create and push a Git tag:
 
 ```bash
-git tag -a v0.1.1 -m "macfw v0.1.1"
+git tag -a v0.1.2 -m "macfw v0.1.2"
 git push origin main
-git push origin v0.1.1
+git push origin v0.1.2
 ```
 
 4. GitHub Actions will build the wheel and sdist, then publish to PyPI.
