@@ -85,7 +85,7 @@ After installation:
 macfw --version
 ```
 
-Once the package is published to PyPI, the intended installation command will be:
+Install from PyPI:
 
 ```bash
 pipx install macfw
