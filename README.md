@@ -1,8 +1,20 @@
-English | [简体中文](./README.zh-CN.md)
+English | [中文](./README.zh-CN.md)
 
 # macfw
 
 `macfw` is a small `pf`-based firewall manager for macOS with a `ufw`-like CLI.
+
+A `ufw`-like firewall CLI for macOS.
+
+Built for Macs that behave more like servers, especially in IPv6-exposed environments.
+
+[Why](#why-this-exists) • [Quick Start](#quick-start) • [Installation](#install) • [Common Commands](#common-commands) • [Rule Model](#rule-model) • [Default Policy](#default-policy)
+
+[![PyPI version](https://img.shields.io/pypi/v/macfw)](https://pypi.org/project/macfw/)
+![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
+![macOS](https://img.shields.io/badge/platform-macOS-black)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![English | 中文](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-blue)](./README.zh-CN.md)
 
 It is designed for one common use case:
 

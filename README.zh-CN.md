@@ -1,8 +1,20 @@
-[English](./README.md) | 简体中文
+[English](./README.md) | 中文
 
 # macfw
 
 `macfw` 是一个运行在 macOS 上、基于 `pf` 的小型防火墙管理工具，命令行交互风格参考了 `ufw`。
+
+一个更接近 `ufw` 体验的 macOS 防火墙命令行工具。
+
+它主要面向那些“更像服务器而不是日常笔记本”的 Mac，尤其适合 IPv6 直连公网的环境。
+
+[为什么存在](#这个工具为什么存在) • [快速开始](#快速开始) • [安装](#安装) • [常用命令](#常用命令) • [规则模型](#规则模型) • [默认策略](#默认策略)
+
+[![PyPI version](https://img.shields.io/pypi/v/macfw)](https://pypi.org/project/macfw/)
+![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
+![macOS](https://img.shields.io/badge/platform-macOS-black)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![English | 中文](https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-blue)](./README.md)
 
 它主要解决这样一类场景：
 
