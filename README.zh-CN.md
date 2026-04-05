@@ -85,6 +85,12 @@ pipx install git+https://github.com/tudoujunha/macfw.git
 macfw --version
 ```
 
+等包正式发布到 PyPI 后，推荐安装方式会变成：
+
+```bash
+pipx install macfw
+```
+
 ## 开始前要先确认什么
 
 你需要知道哪个网卡承接了你想保护的入站流量。
@@ -343,6 +349,10 @@ python3 -m unittest discover -s tests -v
 ```bash
 PYTHONPATH=. python3 -m macfw --help
 ```
+
+如果你是维护者，发布流程说明见：
+
+- [`docs/publishing.md`](./docs/publishing.md)
 
 ## 许可证
 

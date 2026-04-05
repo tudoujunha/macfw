@@ -85,6 +85,12 @@ After installation:
 macfw --version
 ```
 
+Once the package is published to PyPI, the intended installation command will be:
+
+```bash
+pipx install macfw
+```
+
 ## Before you start
 
 You need to know which network interface receives the inbound traffic you want to protect.
@@ -343,6 +349,10 @@ Run directly from the repository checkout:
 ```bash
 PYTHONPATH=. python3 -m macfw --help
 ```
+
+For maintainer release steps, see:
+
+- [`docs/publishing.md`](./docs/publishing.md)
 
 ## License
 

@@ -16,7 +16,6 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     author="tudoujun",
-    license="MIT",
     python_requires=">=3.9",
     packages=find_packages(include=["macfw", "macfw.*"]),
     entry_points={

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "A small pf-based firewall manager for macOS with a ufw-like CLI"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
   { name = "tudoujun" }
 ]
@@ -17,7 +18,6 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
   "Intended Audience :: System Administrators",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: MacOS",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
@@ -27,6 +27,11 @@ classifiers = [
   "Topic :: Security",
   "Topic :: System :: Systems Administration",
 ]
+
+[project.urls]
+Homepage = "https://github.com/tudoujunha/macfw"
+Repository = "https://github.com/tudoujunha/macfw"
+Issues = "https://github.com/tudoujunha/macfw/issues"
 
 [project.scripts]
 macfw = "macfw.cli:main"
