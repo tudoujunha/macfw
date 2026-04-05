@@ -74,9 +74,18 @@ git push origin v0.1.2
 
 4. GitHub Actions will build the wheel and sdist, then publish to PyPI.
 
+5. Verify the published package from PyPI:
+
+```bash
+python3 -m pip install --user pipx
+pipx install macfw==0.1.2
+macfw --version
+```
+
 ## Notes
 
 - The PyPI workflow publishes on tag pushes matching `v*`.
 - The TestPyPI workflow is manual on purpose.
 - If the package name is already taken on PyPI, publishing will fail until the name is changed.
-- The package is meant to be installed with `pipx install macfw` once it is on PyPI.
+- The recommended end-user install path is `pipx install macfw`.
+- If you are already using `macfw`, upgrade with `pipx upgrade macfw`.

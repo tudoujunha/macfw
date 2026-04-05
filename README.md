@@ -59,7 +59,32 @@ This project is for macOS only. It is not intended for Linux, BSD routers, or Wi
 
 ## Install
 
-### Option 1: install from a local clone
+### Recommended: install from PyPI with `pipx`
+
+`pipx` is the best default for a CLI tool because it keeps the application isolated while still exposing the `macfw` command on your shell `PATH`.
+
+```bash
+python3 -m pip install --user pipx
+pipx install macfw
+macfw --version
+```
+
+Upgrade later:
+
+```bash
+pipx upgrade macfw
+```
+
+### Alternative: install from PyPI with `pip`
+
+If you prefer a plain Python environment instead of `pipx`:
+
+```bash
+python3 -m pip install macfw
+macfw --version
+```
+
+### Development: install from a local clone
 
 ```bash
 git clone https://github.com/tudoujunha/macfw.git
@@ -67,28 +92,16 @@ cd macfw
 python3 -m pip install .
 ```
 
-### Option 2: install directly from GitHub
+### Development: install directly from GitHub
 
 ```bash
 python3 -m pip install git+https://github.com/tudoujunha/macfw.git
 ```
 
-### Option 3: isolated CLI install with `pipx`
+### Development: isolated CLI install from GitHub with `pipx`
 
 ```bash
 pipx install git+https://github.com/tudoujunha/macfw.git
-```
-
-After installation:
-
-```bash
-macfw --version
-```
-
-Install from PyPI:
-
-```bash
-pipx install macfw
 ```
 
 ## Before you start
