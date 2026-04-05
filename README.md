@@ -1,5 +1,3 @@
-English | [中文](./README.zh-CN.md)
-
 # macfw
 
 `macfw` is a small `pf`-based firewall manager for macOS with a `ufw`-like CLI.

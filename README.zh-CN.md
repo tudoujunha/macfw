@@ -1,5 +1,3 @@
-[English](./README.md) | 中文
-
 # macfw
 
 `macfw` 是一个运行在 macOS 上、基于 `pf` 的小型防火墙管理工具，命令行交互风格参考了 `ufw`。
