@@ -28,6 +28,7 @@ TRUSTED_V6_SOURCES = [
 ]
 LAN_SOURCE_EXPR = "{ ($ext_if:network), " + ", ".join(TRUSTED_V4_SOURCES + TRUSTED_V6_SOURCES) + " }"
 LOCAL_DEST_EXPR = "{ 127.0.0.1, ::1 }"
+INTERFACE_DEST_EXPR = "($ext_if)"
 
 
 def ensure_pf_hook(contents: str) -> str:
@@ -81,7 +82,8 @@ def render_anchor(interface: str, enabled: bool, rules: Iterable[Rule]) -> str:
         icmp6_essential = "{{ unreach, toobig, timex, paramprob, neighbrsol, neighbradv, routersol, routeradv }}"
 
         pass in quick on lo0 all keep state
-        pass in quick on $ext_if from {LAN_SOURCE_EXPR} to self keep state
+        pass in quick on $ext_if inet proto udp from any port 67 to any port 68 keep state
+        pass in quick on $ext_if from {LAN_SOURCE_EXPR} to {INTERFACE_DEST_EXPR} keep state
         pass out quick all keep state
         pass in quick on $ext_if inet6 proto ipv6-icmp from any to any icmp6-type $icmp6_essential keep state
         '''
@@ -114,7 +116,7 @@ def render_single_rule(rule: Rule, proto: str) -> str:
     action = "pass" if rule.action == "allow" else "block drop"
     interface = "lo0" if rule.source == "local" else "$ext_if"
     source = source_expr(rule.source)
-    destination = LOCAL_DEST_EXPR if rule.source == "local" else "self"
+    destination = LOCAL_DEST_EXPR if rule.source == "local" else INTERFACE_DEST_EXPR
 
     parts = [action, "in", "quick", "on", interface]
     family = family_expr(rule.family)
